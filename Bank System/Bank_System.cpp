@@ -4,57 +4,10 @@
 #include <vector>
 #include <limits>
 #include <iomanip>
+#include "Header/types.h"
 
 const std::string DATA_FILE = "ClientsData.txt";
 const std::string SEPARATOR = " /##/ ";
-
-enum eMainMenu {
-
-    ADD_NEW_CLIENT = 1,
-
-    SHOW_ALL_CLIENTS = 2,
-
-    UPDATE_CLIENT = 3,
-
-    DELETE_CLIENT = 4,
-
-    FIND_CLIENT = 5,
-
-    TRANSACTIONS = 6,
-
-    EXIT = 7,
-};
-
-enum eTransactionsMenu {
-
-    DEPOSIT = 1,
-
-    WITHDRAW = 2,
-
-    SHOW_TOTAL_BALANCES = 3,
-
-    RETURN_TO_MAIN_MENU = 4,
-};
-
-enum eReturnToMenu {
-
-    MAIN_MENU = 1,
-
-    TRANSACTIONS_MENU = 2,
-};
-    
-
-struct sClientData {
-
-    std::string accountNum;
-    int pincode;
-    std::string clientName;
-    std::string countryPin;
-    std::string phoneNum;
-    float accountBalance;
-    bool isDeleted = false;
-};
-
 
 float readNum(const std::string& msg, const std::string& separator = " ") {
 
@@ -135,6 +88,7 @@ char readChar(const std::string& msg, const std::string& separator = " ") {
 void clearScreen() {
 
     system("cls");
+    std::cout << std::endl;
 }
 
 
@@ -185,6 +139,7 @@ std::vector <std::string> splitText(const std::string& text, const std::string& 
 
 void endService(const std::string& msg = "Press any key to return to main menu...") {
 
+
     std::cout << '\n' << msg;
     system("pause>0");
 
@@ -232,11 +187,11 @@ std::string readAccountNum() {
     return readText("Enter country pin:", " +");
 }
 
-int getClientIndex(const std::string& accountNum, const std::vector <sClientData>& vClientsData);
+int getClientIndex(const std::string& accountNum, const std::vector <types::sClientData>& vClientsData);
 
-sClientData readClientData(std::vector <sClientData>& vClientsData) {
+types::sClientData readClientData(std::vector <types::sClientData>& vClientsData) {
 
-    sClientData clientData;
+    types::sClientData clientData;
 
 
     clientData.accountNum = readText("Enter account number");
@@ -248,9 +203,9 @@ sClientData readClientData(std::vector <sClientData>& vClientsData) {
     }
 
     clientData.pincode = readPincode();
-    clientData.clientName = readClientName();
+    clientData.name = readClientName();
     clientData.countryPin = readCountryPin();
-    clientData.phoneNum = '+' + clientData.countryPin + ' ' + readPhoneNum();
+    clientData.phoneNum = "+" + clientData.countryPin + " " + readPhoneNum();
     clientData.accountBalance = readAccountBalance();
 
 
@@ -258,10 +213,10 @@ sClientData readClientData(std::vector <sClientData>& vClientsData) {
 }
 
 
-void readOtherClientData(sClientData& clientData) {
+void readOtherClientData(types::sClientData& clientData) {
 
     clientData.pincode = readPincode();
-    clientData.clientName = readClientName();
+    clientData.name = readClientName();
     clientData.countryPin = readCountryPin();
     clientData.phoneNum = readPhoneNum();
     clientData.accountBalance = readAccountBalance();
@@ -273,11 +228,11 @@ int readWithdrawAmount() {
     return readPositiveNum("\nEnter withdraw amount:", " $");
 }
 
-int getClientIndex(const std::string& accountNum, const std::vector <sClientData>& vClientsData) {
+int getClientIndex(const std::string& accountNum, const std::vector <types::sClientData>& vClientsData) {
 
     int index = 0;
 
-    for (const sClientData& clientData : vClientsData) {
+    for (const types::sClientData& clientData : vClientsData) {
 
         if (accountNum == clientData.accountNum)
             return index;
@@ -322,15 +277,15 @@ std::vector <std::string> convertRecordToData(const std::string& record, const s
 }
 
 
-sClientData fillClientData(const std::string& record, const std::string& separator) {
+types::sClientData fillClientData(const std::string& record, const std::string& separator) {
 
     std::vector <std::string> vData = convertRecordToData(record, separator);
 
-    sClientData clientData;
+    types::sClientData clientData;
 
     clientData.accountNum = vData[0];
     clientData.pincode = stoi(vData[1]);
-    clientData.clientName = vData[2];
+    clientData.name = vData[2];
     clientData.phoneNum = vData[3];
     clientData.accountBalance = std::stof(vData[4]);
 
@@ -338,11 +293,11 @@ sClientData fillClientData(const std::string& record, const std::string& separat
 }
 
 
-int calcTotalBalanceOfClient(const std::vector <sClientData>& vClientsData) {
+int calcTotalBalanceOfClient(const std::vector <types::sClientData>& vClientsData) {
 
     int totalBalance = 0;
 
-    for (const sClientData& clientData : vClientsData) {
+    for (const types::sClientData& clientData : vClientsData) {
 
         totalBalance += clientData.accountBalance;
     }
@@ -351,9 +306,9 @@ int calcTotalBalanceOfClient(const std::vector <sClientData>& vClientsData) {
 }
 
 
-void saveClientsToFile(const std::vector <sClientData>& vClientsData, const std::string& fileName = DATA_FILE, const std::string& separator = SEPARATOR);
+void saveClientsToFile(const std::vector <types::sClientData>& vClientsData, const std::string& fileName = DATA_FILE, const std::string& separator = SEPARATOR);
 
-void confirmAndProcessTransaction(int index, int moneyAmount, std::vector <sClientData>& vClientsData) {
+void confirmAndProcessTransaction(int index, int moneyAmount, std::vector <types::sClientData>& vClientsData) {
 
     char sureToWithdraw = readChar("\nAre you sure you want to perform this transaction (y/n):");
 
@@ -365,17 +320,17 @@ void confirmAndProcessTransaction(int index, int moneyAmount, std::vector <sClie
 }
 
 
-void returnToMenu(eReturnToMenu menu = eReturnToMenu::MAIN_MENU) {
+void returnToMenu(types::eReturnToMenu menu = types::eReturnToMenu::MAIN_MENU) {
 
     switch (menu) {
 
-    case eReturnToMenu::MAIN_MENU:
+    case types::eReturnToMenu::MAIN_MENU:
 
         endService();
         break;
 
 
-    case eReturnToMenu::TRANSACTIONS_MENU:
+    case types::eReturnToMenu::TRANSACTIONS_MENU:
 
         endService("Press 'Enter' key to return to transactions menu...");
         break;
@@ -426,24 +381,24 @@ void printClientsListHeader(int numOfClients) {
 }
 
 
-void printClientsListBody(const sClientData& clientData) {
+void printClientsListBody(const types::sClientData& clientData) {
 
     std::cout << std::left;
 
 
     std::cout << "| " << std::setw(15) << clientData.accountNum;
     std::cout << "| " << std::setw(10) << clientData.pincode;
-    std::cout << "| " << std::setw(25) << clientData.clientName;
+    std::cout << "| " << std::setw(25) << clientData.name;
     std::cout << "| " << std::setw(20) << clientData.phoneNum;
     std::cout << "| $" << std::setw(10) << clientData.accountBalance << std::endl;
 }
 
 
-void printFoundedClient(const sClientData& clientData) {
+void printFoundedClient(const types::sClientData& clientData) {
 
     std::cout << "\nAccount Number: " << clientData.accountNum;
     std::cout << "\nPincode: " << clientData.pincode;
-    std::cout << "\nClient Name: " << clientData.clientName;
+    std::cout << "\nClient Name: " << clientData.name;
     std::cout << "\nPhone Number: " << clientData.phoneNum;
     std::cout << "\nAccount Balance: $" << clientData.accountBalance << std::endl;
 }
@@ -464,19 +419,19 @@ void printBalancesListHeader(int numOfClients) {
 }
 
 
-void printBalancesListBody(const sClientData& clientData) {
+void printBalancesListBody(const types::sClientData& clientData) {
 
     std::cout << std::left;
 
 
     std::cout << "| " << std::setw(15) << clientData.accountNum;
-    std::cout << "| " << std::setw(25) << clientData.clientName;
+    std::cout << "| " << std::setw(25) << clientData.name;
     std::cout << "| $" << std::setw(10) << clientData.accountBalance << std::endl;
 }
 
-std::vector <sClientData> loadClientsDataFromFileToVec(const std::string& fileName = DATA_FILE, const std::string& separator = SEPARATOR) {
+std::vector <types::sClientData> loadClientsDataFromFileToVec(const std::string& fileName = DATA_FILE, const std::string& separator = SEPARATOR) {
 
-    std::vector <sClientData> vClientsData;
+    std::vector <types::sClientData> vClientsData;
 
     std::fstream File;
 
@@ -488,7 +443,7 @@ std::vector <sClientData> loadClientsDataFromFileToVec(const std::string& fileNa
 
         while (std::getline(File, currentClientData)) {
 
-            sClientData clientData = fillClientData(currentClientData, separator);
+            types::sClientData clientData = fillClientData(currentClientData, separator);
 
             vClientsData.push_back(clientData);
         }
@@ -500,9 +455,9 @@ std::vector <sClientData> loadClientsDataFromFileToVec(const std::string& fileNa
 }
 
 
-std::string convertDataToRecord(const sClientData& clientData, const std::string& separator = SEPARATOR);
+std::string convertDataToRecord(const types::sClientData& clientData, const std::string& separator = SEPARATOR);
 
-bool saveClientsToFileAfterDelete(const std::vector <sClientData>& vClientsData, const std::string& fileName = DATA_FILE, const std::string& separator = SEPARATOR) {
+bool saveClientsToFileAfterDelete(const std::vector <types::sClientData>& vClientsData, const std::string& fileName = DATA_FILE, const std::string& separator = SEPARATOR) {
 
     std::fstream File;
 
@@ -510,7 +465,7 @@ bool saveClientsToFileAfterDelete(const std::vector <sClientData>& vClientsData,
 
     if (File.is_open()) {
 
-        for (const sClientData& clientData : vClientsData) {
+        for (const types::sClientData& clientData : vClientsData) {
 
             if (clientData.isDeleted == false) {
 
@@ -548,13 +503,13 @@ bool saveRecordToFile(const std::string & record, const std::string & fileName =
 }
 
 
-std::string convertDataToRecord(const sClientData& clientData, const std::string& separator) {
+std::string convertDataToRecord(const types::sClientData& clientData, const std::string& separator) {
 
     std::string record = "";
 
     record += clientData.accountNum + separator;
     record += std::to_string(clientData.pincode) + separator;
-    record += clientData.clientName + separator;
+    record += clientData.name + separator;
     record += clientData.phoneNum + separator;
     record += std::to_string(clientData.accountBalance);
 
@@ -562,17 +517,17 @@ std::string convertDataToRecord(const sClientData& clientData, const std::string
 }
 
 
-void saveClientsToFile(const std::vector <sClientData>& vClientsData, const std::string& fileName, const std::string& separator) {
+void saveClientsToFile(const std::vector <types::sClientData>& vClientsData, const std::string& fileName, const std::string& separator) {
 
-    for (const sClientData& clientData : vClientsData) {
+    for (const types::sClientData& clientData : vClientsData) {
 
         saveRecordToFile(convertDataToRecord(clientData));
     }
 }
 
-void addNewClient(std::vector <sClientData>& vClientsData) {
+void addNewClient(std::vector <types::sClientData>& vClientsData) {
 
-    sClientData clientData;
+    types::sClientData clientData;
 
     clientData = readClientData(vClientsData);
 
@@ -588,7 +543,7 @@ void addClients() {
     std::cout << Tabs(6) << "Add New Client\n";
     std::cout << Tabs(4) << "---------------------------------------" << std::endl;
 
-    std::vector <sClientData> vClientsData = loadClientsDataFromFileToVec();
+    std::vector <types::sClientData> vClientsData = loadClientsDataFromFileToVec();
 
     char addAnotherClient;
 
@@ -607,7 +562,7 @@ void addClients() {
 
 void showAllClients() {
 
-    std::vector <sClientData> vClientsData = loadClientsDataFromFileToVec();
+    std::vector <types::sClientData> vClientsData = loadClientsDataFromFileToVec();
 
     if (vClientsData.empty())
         std::cout << "\nThere isn't any client had been added yet!" << std::endl;
@@ -621,7 +576,7 @@ void showAllClients() {
 
         printClientsListHeader(vClientsData.size());
 
-        for (const sClientData& clientData : vClientsData) {
+        for (const types::sClientData& clientData : vClientsData) {
 
             printClientsListBody(clientData);
         }
@@ -630,7 +585,7 @@ void showAllClients() {
     returnToMenu();
 }
 
-void updateClientDataByAccountNum(const std::string& accountNum, std::vector <sClientData>& vClientsData) {
+void updateClientDataByAccountNum(const std::string& accountNum, std::vector <types::sClientData>& vClientsData) {
 
     int clientIndex = getClientIndex(accountNum, vClientsData);
 
@@ -661,7 +616,7 @@ void updateClientData() {
     std::cout << Tabs(5) << "Update Client Info\n";
     std::cout << Tabs(4) << "----------------------------" << std::endl;
 
-    std::vector <sClientData> vClientsData = loadClientsDataFromFileToVec();
+    std::vector <types::sClientData> vClientsData = loadClientsDataFromFileToVec();
 
     std::string accountNum = readAccountNum();
 
@@ -670,7 +625,7 @@ void updateClientData() {
     returnToMenu();
 }
 
-void deleteClientByAccountNum(const std::string& accountNum, std::vector <sClientData>& vClientsData) {
+void deleteClientByAccountNum(const std::string& accountNum, std::vector <types::sClientData>& vClientsData) {
 
     int clientIndex = getClientIndex(accountNum, vClientsData);
 
@@ -701,7 +656,7 @@ void deleteClient() {
     std::cout << Tabs(5) << "Delete Client\n";
     std::cout << Tabs(4) << "------------------------------" << std::endl;
 
-    std::vector <sClientData> vClientsData = loadClientsDataFromFileToVec();
+    std::vector <types::sClientData> vClientsData = loadClientsDataFromFileToVec();
 
     std::string accountNum = readAccountNum();
 
@@ -710,7 +665,7 @@ void deleteClient() {
     returnToMenu();
 }
 
-void findClientByAccountNum(const std::string& accountNum, const std::vector <sClientData>& vClientsData) {
+void findClientByAccountNum(const std::string& accountNum, const std::vector <types::sClientData>& vClientsData) {
 
     int clientIndex = getClientIndex(accountNum, vClientsData);
 
@@ -728,7 +683,7 @@ void findClientByAccountNum(const std::string& accountNum, const std::vector <sC
 
 void findClient() {
 
-    std::vector <sClientData> vClientsData = loadClientsDataFromFileToVec();
+    std::vector <types::sClientData> vClientsData = loadClientsDataFromFileToVec();
 
     std::cout << Tabs(4) << "------------------------------\n";
     std::cout << Tabs(5) << "Find Client\n";
@@ -737,9 +692,10 @@ void findClient() {
     std::string accountNum = readAccountNum();
 
     findClientByAccountNum(accountNum, vClientsData);
+    endService();
 }
 
-void findClientGetIndexPrintClient(int& clientIndex, const std::vector <sClientData>& vClientsData) {
+void findClientGetIndexPrintClient(int& clientIndex, const std::vector <types::sClientData>& vClientsData) {
 
     std::string accountNum = readAccountNum();
 
@@ -757,7 +713,7 @@ void findClientGetIndexPrintClient(int& clientIndex, const std::vector <sClientD
 
 void Deposit() {
 
-    std::vector <sClientData> vClientsData = loadClientsDataFromFileToVec();
+    std::vector <types::sClientData> vClientsData = loadClientsDataFromFileToVec();
 
 
     std::cout << Tabs(4) << "------------------------\n";
@@ -773,13 +729,13 @@ void Deposit() {
     
     confirmAndProcessTransaction(clientIndex, depositAmount, vClientsData);
 
-    returnToMenu(eReturnToMenu::TRANSACTIONS_MENU);
+    returnToMenu(types::eReturnToMenu::TRANSACTIONS_MENU);
 }
 
 
 void Withdraw() {
 
-    std::vector <sClientData> vClientsData = loadClientsDataFromFileToVec();
+    std::vector <types::sClientData> vClientsData = loadClientsDataFromFileToVec();
 
     std::cout << Tabs(4) << "------------------------\n";
     std::cout << Tabs(5) << "Withdraw\n";
@@ -801,19 +757,19 @@ void Withdraw() {
 
     confirmAndProcessTransaction(clientIndex, withdrawAmount * -1, vClientsData);
 
-    returnToMenu(eReturnToMenu::TRANSACTIONS_MENU);
+    returnToMenu(types::eReturnToMenu::TRANSACTIONS_MENU);
 }
 
 
 void showBalances() {
 
-    std::vector <sClientData> vClientsData = loadClientsDataFromFileToVec();
+    std::vector <types::sClientData> vClientsData = loadClientsDataFromFileToVec();
 
     printBalancesListHeader(vClientsData.size());
 
     int totalBalance = 0;
 
-    for (const sClientData& clientData : vClientsData) {
+    for (const types::sClientData& clientData : vClientsData) {
 
         printBalancesListBody(clientData);
         totalBalance += clientData.accountBalance;
@@ -823,31 +779,31 @@ void showBalances() {
 
     std::cout << '\n' << Tabs(4) << "Total Balance: $" << totalBalance << std::endl;
 
-    returnToMenu(eReturnToMenu::TRANSACTIONS_MENU);
+    returnToMenu(types::eReturnToMenu::TRANSACTIONS_MENU);
 }
 
-void applyTransaction(eTransactionsMenu transactionChoose) {
+void applyTransaction(types::eTransactionsMenu transactionChoose) {
 
     clearScreen();
 
     switch (transactionChoose) {
 
-    case eTransactionsMenu::DEPOSIT:
+    case types::eTransactionsMenu::DEPOSIT:
 
         Deposit();
         break;
 
-    case eTransactionsMenu::WITHDRAW:
+    case types::eTransactionsMenu::WITHDRAW:
 
         Withdraw();
         break;
 
-    case eTransactionsMenu::SHOW_TOTAL_BALANCES:
+    case types::eTransactionsMenu::SHOW_ALL_BALANCES:
 
         showBalances();
         break;
 
-    case eTransactionsMenu::RETURN_TO_MAIN_MENU:
+    case types::eTransactionsMenu::RETURN_TO_MAIN_MENU:
 
         return;
     }
@@ -855,17 +811,17 @@ void applyTransaction(eTransactionsMenu transactionChoose) {
 
 void Transactions() {
 
-    eTransactionsMenu clientChoice;
+    types::eTransactionsMenu clientChoice;
 
     do {
 
         printTransactionMenu();
 
-        clientChoice = (eTransactionsMenu)readClientChoiceFromMenu(4);
+        clientChoice = (types::eTransactionsMenu)readClientChoiceFromMenu(4);
 
         applyTransaction(clientChoice);
 
-    } while (clientChoice != RETURN_TO_MAIN_MENU);
+    } while (clientChoice != types::eTransactionsMenu::RETURN_TO_MAIN_MENU);
 }
 
 
@@ -876,43 +832,43 @@ void Exit() {
     std::cout << Tabs(4) << "------------------------\n";
 }
 
-void applyClientService(eMainMenu clientService) {
+void applyClientService(types::eMainMenu clientService) {
 
     clearScreen();
 
     switch (clientService) {
 
-    case eMainMenu::ADD_NEW_CLIENT:
+    case types::eMainMenu::ADD_NEW_CLIENT:
 
         addClients();
         break;
 
-    case eMainMenu::SHOW_ALL_CLIENTS:
+    case types::eMainMenu::SHOW_ALL_CLIENTS:
 
         showAllClients();
         break;
 
-    case eMainMenu::UPDATE_CLIENT:
+    case types::eMainMenu::UPDATE_CLIENT_INFO:
 
         updateClientData();
         break;
 
-    case eMainMenu::DELETE_CLIENT:
+    case types::eMainMenu::DELETE_CLIENT:
 
         deleteClient();
         break;
 
-    case eMainMenu::FIND_CLIENT:
+    case types::eMainMenu::FIND_CLIENT:
 
         findClient();
         break;
 
-    case eMainMenu::TRANSACTIONS:
+    case types::eMainMenu::TRANSACTIONS:
 
         Transactions();
         break;
 
-    case eMainMenu::EXIT:
+    case types::eMainMenu::EXIT:
 
         Exit();
         break;
@@ -922,17 +878,17 @@ void applyClientService(eMainMenu clientService) {
 
 void startProgram() {
 
-    eMainMenu clientService;
+    types::eMainMenu clientService;
 
     do {
 
         printMainMenuScreen();
 
-        clientService = (eMainMenu)readClientChoiceFromMenu(7);
+        clientService = (types::eMainMenu)readClientChoiceFromMenu(7);
 
         applyClientService(clientService);
 
-    } while (clientService != eMainMenu::EXIT);
+    } while (clientService != types::eMainMenu::EXIT);
 
 }
 
